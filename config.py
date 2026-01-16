@@ -9,13 +9,14 @@ from pydantic_settings import (
 
 class Settings(BaseSettings):
     
-    # This variables should be set in.env file
+    # This variables should be set in .env file
     DB_HOST: str
     DB_PORT: int
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
     BOT_TOKEN: str
+    LOGGING: bool
 
     @property
     def DATABASE_URL(self):

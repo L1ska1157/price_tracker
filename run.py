@@ -11,10 +11,11 @@ from tg_bot.handlers import (
 from database.func import (
     create_tables
 )
-from custom import (
-    set_custom_logging
+from logging_setup import (
+    logging_setup
 )
 import asyncio
+import logging
 
 
 # *** Startpoint        
@@ -24,6 +25,10 @@ bot = Bot(token=settings.BOT_TOKEN)
 dp = Dispatcher() 
 
 async def main():
+    logging_setup()
+    log = logging.getLogger(__name__) 
+    log.info('Running')
+    
     create_tables()
     
     dp.include_router(router)
@@ -31,8 +36,7 @@ async def main():
 
 
 if __name__ == '__main__':
-    set_custom_logging() # just some coloring for log messages
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print('---- EXIT')
+        print('[ EXIT ]')

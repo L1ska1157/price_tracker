@@ -1,2 +1,4 @@
 .env
-__pycache__/
+__pycache__\
+database\__pycache__\
+tg_bot\__pycache__\
