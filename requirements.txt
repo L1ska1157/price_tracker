@@ -4,3 +4,6 @@ asyncpg
 pydantic_config
 validators
 sqlalchemy
+beautifulsoup4
+lxml
+aiohttp

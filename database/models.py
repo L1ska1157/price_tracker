@@ -24,9 +24,16 @@ from enum import (
 
 
 class ShopType(Enum):
-    shop_1 = 'foxtrot'
-    shop_2 = 'allo'
-
+    foxtrot = {
+            'price': 'product-box__main_price',
+            'name': ''
+    }
+    allo = 'allo'
+    comfy = 'comfy',
+    cytrus = 'cytrus'
+    moyo = 'moyo'
+    stylus = 'stylus'
+    
 
 class Users(Base):
     __tablename__ = 'Users'
