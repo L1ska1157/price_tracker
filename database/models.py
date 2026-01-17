@@ -1,11 +1,6 @@
 from sqlalchemy import (
-    Table,
-    Column,
-    Integer,
-    String,
+    BigInteger,
     ForeignKey,
-    text,
-    CheckConstraint,
     Index
     )
 from sqlalchemy.orm import (Mapped,
@@ -31,7 +26,7 @@ class ShopType(Enum):
 class Users(Base):
     __tablename__ = 'Users'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     tracked_products: Mapped[list['Products']] = relationship(
         back_populates='user'
     )
