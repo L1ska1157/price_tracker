@@ -2,10 +2,10 @@ from bs4 import (
     BeautifulSoup
 )
 import lxml
-import aiohttp
-import asyncio
+import requests
 import logging 
 from database.models import ShopType
+import re
 
 
 # *** Parcer
@@ -14,40 +14,38 @@ from database.models import ShopType
 log = logging.getLogger(__name__)
 
 
-async def parce(shop: ShopType, link: str):
-    log.info(f'Getting price for product from {shop.value}')
-    
-    div_classes = {
-        'foxtrot': {
-            'price': 'product-box__main_price',
-            'name': 
-            },
-        'comfy': 'price__current',
-        'allo': 'a-product-price__current-price',
-        'cytrus': 'price medium no-wrap f-secondary Price_price__KKCnw',
-        'moyo': 'product_price_current',
-        'stylus': 'sc-79f6e9d1-6 jaaakJ'
+def parce(shop: ShopType, link: str):
+    headers = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'accept-language': 'ru-UA,ru;q=0.9,uk-UA;q=0.8,uk;q=0.7,ru-RU;q=0.6,en-US;q=0.5,en;q=0.4'
     }
+    parcing_classes = shop.value
+    if type(parcing_classes) == tuple:
+        parcing_classes = parcing_classes[0]
+
+    log.info(f'Getting price for product from {shop.name}')
     
-    async with aiohttp.ClientSession() as ses:
-        response = await ses.get(url=link)
-    
-    soup = BeautifulSoup(await response.text, 'lxml')
+    response = requests.get(url=link, headers=headers)
+
+    soup = BeautifulSoup(response.content, features='lxml')
+    with open('page.html', 'w', encoding='utf-8') as f:
+        f.write(soup.prettify())
     price = int(
-        soup.find(class_=div_classes[shop.value]['price'])
-        .get_text()
-        .replace(' ', '')
-        .replace('₴', '')
-        .replace('грн', '')
+        re.sub(
+            r'\D', 
+            '', 
+            soup.find(class_=parcing_classes['price']).get_text()
         )
-    name = (
-        soup.find
     )
+    # name = (
+    #     soup.find
+    # )
     
     log.info(f'Got price = {price}\nLink: {link}')
     return {
-        'price': price,
-        'name': name
+        # 'name': name,
+        'price': price        
     }
 
 
@@ -79,6 +77,7 @@ if __name__ == '__main__':
         }
     ]
     for item in items_test:
+        print(f'{item["shop"].name}: ')
         print(parce(
             link = item['link'],
             shop = item['shop']

@@ -6,4 +6,4 @@ validators
 sqlalchemy
 beautifulsoup4
 lxml
-aiohttp
+requests

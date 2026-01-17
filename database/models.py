@@ -21,13 +21,28 @@ from enum import (
 class ShopType(Enum):
     foxtrot = {
             'price': 'product-box__main_price',
-            'name': ''
+            'name': 'page__title'
     }
-    allo = 'allo'
-    comfy = 'comfy',
-    cytrus = 'cytrus'
-    moyo = 'moyo'
-    stylus = 'stylus'
+    allo = {
+            'price': 'a-product-price__current-price',
+            'name': 'p-view__header-title'
+    }
+    comfy = {
+            'price': 'price__current',
+            'name': 'product-title'
+    },
+    cytrus = {
+            'price': 'price',
+            'name': 'DescriptionTitle_title__PxMkv'
+    }
+    moyo = {
+            'price': 'product_price_current',
+            'name': 'product_name'
+    }
+    stylus = {
+            'price': 'sc-7d638165-4',
+            'name': 'sc-4bec5e00-0'
+    }
     
 
 class Users(Base):
