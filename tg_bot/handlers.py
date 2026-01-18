@@ -56,7 +56,25 @@ async def start(message: Message):
         shops_str += f'\n{shop.name.capitalize()}'
         
     await message.answer(
-        text=f'Привіт! Цей бот створений для зручного відслідковування цін на товари. Підтримувані магазини: {shops_str}',
+        text=f'Привіт! Цей бот створений для зручного відслідковування цін на товари. Підтримувані магазини: {shops_str}\nЩоб додати новий товар до відсслідковування, просто надішліть посилання на нього мені, і я скажу вам, коли його ціна зміниться',
+        reply_markup=kb.menu_kb
+    )
+    
+    
+# ---- HELP func
+@router.message(Command('help'))
+async def help_command(message: Message):
+    log.info(f'Command /help from user {message.chat.username}')
+    add_user(
+            user_id = message.chat.id
+        )
+    
+    shops_str = ''
+    for shop in shops_list:
+        shops_str += f'\n{shop.name.capitalize()}'
+        
+    await message.answer(
+        text=f'Цей бот створений для зручного відслідковування цін на товари. \nПідтримувані магазини: {shops_str}\nЩоб додати новий товар до відсслідковування, просто надішліть посилання на нього мені, і я скажу вам, коли його ціна зміниться. \nВикористайте клавіатуру знизу, щоб переглянути збережені товари, видалити товар який ви більше не хочете відслідковувати або переглянути графік зміни цін за останні 7 днів. \nВраховуйте, що у мене немає даних про ціну товару до того як ви його додали',
         reply_markup=kb.menu_kb
     )
     
