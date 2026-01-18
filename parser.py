@@ -4,9 +4,10 @@ from bs4 import (
 from urllib.parse import (
     urlparse
 ) 
-from database.database import (
+from exceptions import (
     BadResponse,
-    WrongLink
+    WrongLink,
+    NotProductPage
 )
 import lxml
 import requests
@@ -104,17 +105,22 @@ def parse(link: str, shops_list: list):
         raise BadResponse() # processing in headers
     
     soup = BeautifulSoup(response.content, features='lxml')
-        
-    name = (
-        soup.find(class_=shop.name_class).get_text().strip()
-    )
-    price = int(
-        re.sub(
-            r'\D', 
-            '', 
-            soup.find(class_=shop.price_class).get_text()
+    
+    try:
+        name = (
+            soup.find(class_=shop.name_class).get_text().strip()
         )
-    )
+        price = int(
+            re.sub(
+                r'\D', 
+                '', 
+                soup.find(class_=shop.price_class).get_text()
+            )
+        )
+    except TypeError:
+        raise NotProductPage()
+    except Exception as e:
+        log.error(f'Unexpected error: \n{e}')
     
     res = {
         'name': name,

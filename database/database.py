@@ -19,13 +19,3 @@ class Base(DeclarativeBase):
     pass
 
 metadata = Base.metadata
-
-
-# ---- Exceptions
-class RecordAlreadyExistsError(Exception):
-    # To catch when user tries to add existing link
-    pass
-class WrongLink(Exception):
-    pass
-class BadResponse(Exception):
-    pass

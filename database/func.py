@@ -64,7 +64,6 @@ def add_product(user_id: int, link: str, price: int, name: str):
             
         except IntegrityError:
             ses.rollback() 
-            log.info('Trying to add existing link')
             raise RecordAlreadyExistsError() # In headers => sending message that this product already tracking
         
         except Exception as e:

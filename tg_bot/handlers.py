@@ -22,10 +22,11 @@ from database.func import (
     get_all,
     delete_product
 )
-from database.database import (
+from exceptions import (
     RecordAlreadyExistsError,
     BadResponse,
-    WrongLink
+    WrongLink,
+    NotProductPage
 )
 from parser import (
     parse,
@@ -86,7 +87,12 @@ async def new_prod(message: Message):
         log.warning(f'Bad response \n{e}')
         await message.answer(text='Це посилання недоступне \nПеревірте його на правильність. Якщо посилання правильне, можливо сайт тимчасово не відповідає')
 
+    except NotProductPage:
+        log.warning('not a product page')
+        await message.answer(text='Перевірте, чи ви надали посилання саме на товар')
+
     except RecordAlreadyExistsError:
+        log.warning('Already existing product')
         await message.answer(text=f'Ви вже відслідковуєте цей товар! \nЙого ціна зараз {data['price']} грн')
         
     except Exception as e:
@@ -211,3 +217,10 @@ async def try_to_send_when_choosing_product(message: Message):
     await message.answer(
         text = 'Будь ласка, оберіть товар зі списку вище або натисніть "Назад"'
     )
+    
+    
+# ---- If user sends something out of bot functional
+@router.message()
+async def mes_reaction(message: Message):
+    log.info(f'User {message.chat.username} send something that I don\'t know...')
+    await message.answer_sticker('CAACAgIAAxkBAAEQRWxpbVa1zmYv-RYMFmEjMJQYPzqaqgACRRMAAjBLWUk_VuT9OAYobzgE')
