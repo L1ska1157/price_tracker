@@ -9,9 +9,8 @@ from database.models import (
     Products
 )
 from sqlalchemy import (
-    insert,
     select,
-    and_
+    delete
 )
 from sqlalchemy.exc import (
     IntegrityError
@@ -66,7 +65,7 @@ def add_product(user_id: int, link: str, price: int, name: str):
         except IntegrityError:
             ses.rollback() 
             log.info('Trying to add existing link')
-            raise RecordAlreadyExistsError('Link already tracking') # In headers => sending message that this product already tracking
+            raise RecordAlreadyExistsError() # In headers => sending message that this product already tracking
         
         except Exception as e:
             log.error(f'Unknown error: {e}')
@@ -130,4 +129,28 @@ async def parse_all(shop_list: list, bot: Bot | None = None):
         
         ses.commit()
         
-         
+        
+# ---- Gives all products, saved by this user
+def get_all(user_id: int):
+    log.info(f'Getting all products, saved by user with id {user_id}')
+    with ses_factory() as ses:
+        query = (
+            select(Products)
+            .filter_by(user_id = user_id)
+        )
+        products = ses.execute(query).scalars().all()
+        return products
+     
+        
+# ---- Delete item from db
+def delete_product(user_id: int, link: str):
+    with ses_factory() as ses:
+        obj_to_delete = ses.get(Products, (user_id, link))
+        log.info(f'Deleting object {obj_to_delete}')
+        
+        name = obj_to_delete.name
+        
+        ses.delete(obj_to_delete)
+        ses.commit()
+        
+        return name

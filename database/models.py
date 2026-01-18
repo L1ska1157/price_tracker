@@ -10,9 +10,6 @@ from sqlalchemy.orm import (Mapped,
 from database.database import (
     Base
     )
-from enum import (
-    Enum
-)
 
 
 # *** All tables
@@ -53,6 +50,7 @@ class Products(Base):
     price_5: Mapped[int | None]
     price_6: Mapped[int | None]
     
+    
     def __repr__(self):
-        return f'<Product, user_id={self.user_id}, name={self.name}, shop={self.shop}, last_price={self.price_0}>'
+        return f'<Product, user_id={self.user_id}, name={self.name}, last_price={self.price_0}>'
     

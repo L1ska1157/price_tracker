@@ -9,3 +9,4 @@ from aiogram.fsm.state import (
 
 class States(StatesGroup):
     delete = State()
+    get_graph = State()

@@ -10,7 +10,7 @@ from tg_bot.handlers import (
 )
 from database.func import (
     create_tables,
-    parse_all
+    parse_all,
 )
 from logging_setup import (
     logging_setup

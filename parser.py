@@ -4,10 +4,15 @@ from bs4 import (
 from urllib.parse import (
     urlparse
 ) 
+from database.database import (
+    BadResponse,
+    WrongLink
+)
 import lxml
 import requests
 import logging
 import re
+import datetime
 
 
 # *** Parser and avaliable shops
@@ -90,13 +95,13 @@ def parse(link: str, shops_list: list):
     # Get shop
     shop = get_shop(link, shops_list)
     if shop == None:
-        raise ValueError('Domain not mapped')
+        raise WrongLink()
     log.info(f'Parsing data for product from {shop.name}')
     
     # Parse data
     response = requests.get(url=link, headers=headers)
     if response.status_code != 200:
-        raise ValueError('Bad respose') # processing in headers
+        raise BadResponse() # processing in headers
     
     soup = BeautifulSoup(response.content, features='lxml')
         
@@ -118,3 +123,36 @@ def parse(link: str, shops_list: list):
     
     log.info(f'Got price = {price}')
     return res
+
+
+# ---- Getting price changes graph
+def get_graph(product):
+    log.info(f'Getting graph for product {product}')
+    from quickchart import QuickChart
+
+    qc = QuickChart() # object that gives link for image by given data
+    qc.width = 1000
+    qc.height = 600
+    
+    dates = []
+    for i in range(6, -1, -1):
+        dates.append(str(datetime.date.today() - datetime.timedelta(i)))
+        
+    prices = [product.price_6, product.price_5, product.price_4, product.price_3, product.price_2, product.price_1, product.price_0]
+    
+    qc.config = { 
+        "type": "line",
+        "data": {
+            "labels": dates,
+            "datasets": [{
+                "label": "Prices",
+                "data": prices
+            }]
+        },
+        "options": {
+            "legend": {
+                "display": False
+            }
+        }
+    }
+    return qc.get_url()

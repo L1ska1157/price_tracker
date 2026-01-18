@@ -7,6 +7,7 @@ from aiogram.types import (
 from aiogram.utils.keyboard import (
     InlineKeyboardBuilder
     )
+import logging
 
 
 # *** Keyboards for tg bot
@@ -14,6 +15,9 @@ from aiogram.utils.keyboard import (
 
 menu_kb = ReplyKeyboardMarkup(
     keyboard=[
+        [
+            KeyboardButton(text='Графік ціни')
+        ],
         [
             KeyboardButton(text='Видалити товар'),
             KeyboardButton(text='Збережені товари')
@@ -23,20 +27,29 @@ menu_kb = ReplyKeyboardMarkup(
     
 )
 
-async def inline_builder(product_list: list[dict]):
+async def inline_builder(product_list: list):
+    log = logging.Logger(__name__)
+    log.info(f'Making inline keybord with {len(product_list)} rows')
+    
     keyboard = InlineKeyboardBuilder() 
-    for index in len(product_list):
+    for index in range(len(product_list)):
         item = product_list[index]
         keyboard.add(
             InlineKeyboardButton(
-                text=item['name'], 
-                callback_data=index
+                text=item.name, 
+                callback_data=str(index)
                 )
             ) 
         keyboard.add(
             InlineKeyboardButton(
                 text='Переглянути',
-                url=item['url']
+                url=item.link
             )
             )
+    keyboard.add(
+        InlineKeyboardButton(
+            text = 'Назад',
+            callback_data = 'return'
+        )
+    )
     return keyboard.adjust(2).as_markup() 
