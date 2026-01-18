@@ -24,7 +24,7 @@ class ShopType(Enum):
             'name': 'page__title'
     }
     allo = {
-            'price': 'a-product-price__current-price',
+            'price': 'a-product-price__current',
             'name': 'p-view__header-title'
     }
     comfy = {

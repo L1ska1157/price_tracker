@@ -14,11 +14,11 @@ import re
 log = logging.getLogger(__name__)
 
 
-def parce(shop: ShopType, link: str):
+def parce(shop: ShopType, link: str, ses = requests.Session()):
     headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36',
-    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-    'accept-language': 'ru-UA,ru;q=0.9,uk-UA;q=0.8,uk;q=0.7,ru-RU;q=0.6,en-US;q=0.5,en;q=0.4'
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Referer': 'https://www.google.com/'
     }
     parcing_classes = shop.value
     if type(parcing_classes) == tuple:
@@ -26,7 +26,7 @@ def parce(shop: ShopType, link: str):
 
     log.info(f'Getting price for product from {shop.name}')
     
-    response = requests.get(url=link, headers=headers)
+    response = ses.get(url=link, headers=headers)
 
     soup = BeautifulSoup(response.content, features='lxml')
     with open('page.html', 'w', encoding='utf-8') as f:
@@ -38,18 +38,19 @@ def parce(shop: ShopType, link: str):
             soup.find(class_=parcing_classes['price']).get_text()
         )
     )
-    # name = (
-    #     soup.find
-    # )
+    name = (
+        soup.find(class_=parcing_classes['name']).get_text().strip()
+    )
     
     log.info(f'Got price = {price}\nLink: {link}')
     return {
-        # 'name': name,
+        'name': name,
         'price': price        
     }
 
 
 if __name__ == '__main__':
+    # ---- Testing 
     items_test = [
         {
             'link': 'https://www.foxtrot.com.ua/uk/shop/naushniki-sony-over-ear-wireless-mic-silver-wh1000xm6se.html',
@@ -57,6 +58,10 @@ if __name__ == '__main__':
         },
         {
             'link': 'https://comfy.ua/ua/navushniki-povnorozmirni-bezdrotovi-sony-wh-1000xm6-platinum-silver-wh1000xm6s-e.html?gad_source=1&gad_campaignid=20830332909&gclid=CjwKCAiA4KfLBhB0EiwAUY7GAT_xhds91Z3TqU0sf8UCTTtBrGVDbTTqijWpjw3p_zXC_2LiDpuVYxoCpz8QAvD_BwE',
+            'shop': ShopType.comfy
+        },
+        {
+            'link': 'https://comfy.ua/ua/naushniki-polnorazmernye-besprovodnye-sony-wh-1000xm5-blue-wh1000xm5l-ce7.html',
             'shop': ShopType.comfy
         },
         {
