@@ -19,6 +19,13 @@ from sqlalchemy.exc import (
 from config import (
     settings
 )
+from aiogram import (
+    Bot
+)
+from parser import (
+    parse
+)
+import datetime
 import logging
 
 
@@ -66,25 +73,61 @@ def add_product(user_id: int, link: str, price: int, name: str):
 
 
 # ---- Move prices on 1 day
-def move_price(user_id: int, link: str, today_price: int):
+def move_price():
     log.info('Moving price')
     with ses_factory() as ses:
         query = (
-            ses.select(Products)
-            .filter(and_(
-                Products.user_id == user_id,
-                Products.link == link         
-                ))
+            select(Products)
         )
-        product = ses.execute(query).scalars().one()
-        
-        product.price_6 = product.price_5
-        product.price_5 = product.price_4
-        product.price_4 = product.price_3
-        product.price_3 = product.price_2
-        product.price_2 = product.price_1
-        product.price_1 = product.price_0
-        product.price_0 = today_price
+        products = ses.execute(query).scalars().all()
+        for product in products:
+            product.price_6 = product.price_5
+            product.price_5 = product.price_4
+            product.price_4 = product.price_3
+            product.price_3 = product.price_2
+            product.price_2 = product.price_1
+            product.price_1 = product.price_0
+        ses.commit()
             
         
 # ---- Parse all prices, if first parse in day - move prices
+async def parse_all(shop_list: list, bot: Bot | None = None):
+    if datetime.datetime.now().time() < datetime.time(15): # if it's first iteration today
+        move_price()
+        
+    with ses_factory() as ses:
+        query = (
+            select(Products)
+        )
+        products = ses.execute(query).scalars().all()
+        links_query = (
+            select(Products.link, Products.price_0)
+        )
+
+        links = ses.execute(links_query).unique().all()
+        updated_prices = {}
+        for link in links:
+            result = parse(link[0], shop_list)
+            if result['price'] != link[1]:
+                updated_prices[link[0]] = {
+                    'price': result['price'],
+                    'less_then_was': ((result['price'] - link[1]) < 0)
+                    }
+            
+        for product in products:
+            if product.link in updated_prices.keys():
+                if updated_prices[product.link]['less_then_was']:
+                    await bot.send_message(
+                        chat_id = product.user_id,
+                        text=f'У {product.name} знизилася ціна до {updated_prices[product.link]['price']} грн!\nПосилання на товар; {product.link}'
+                    )
+                else:
+                    await bot.send_message(
+                        chat_id = product.user_id,
+                        text=f'На жаль, у {product.name} виросла ціна до {updated_prices[product.link]['price']} грн(\nПосилання на товар; {product.link}'
+                    )
+                product.price_0 = updated_prices[product.link]['price']
+        
+        ses.commit()
+        
+         

@@ -44,7 +44,7 @@ async def start(message: Message):
     
     shops_str = ''
     for shop in shops_list:
-        shops_str += f'\n{shop.name.capitalize}'
+        shops_str += f'\n{shop.name.capitalize()}'
         
     await message.answer(
         text=f'Привіт! Цей бот створений для зручного відслідковування цін на товари. Підтримувані магазини: {shops_str}',

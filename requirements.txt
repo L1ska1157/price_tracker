@@ -6,3 +6,4 @@ sqlalchemy
 beautifulsoup4
 lxml
 requests
+apscheduler

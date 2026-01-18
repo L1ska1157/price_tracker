@@ -9,10 +9,17 @@ from tg_bot.handlers import (
     router
 )
 from database.func import (
-    create_tables
+    create_tables,
+    parse_all
 )
 from logging_setup import (
     logging_setup
+)
+from apscheduler.schedulers.asyncio import (
+    AsyncIOScheduler
+)
+from parser import (
+    shops_list
 )
 import asyncio
 import logging
@@ -30,6 +37,20 @@ async def main():
     log.info('Running')
     
     create_tables()
+    
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(
+        parse_all, 
+        trigger='cron', 
+        hour='10,15,20', 
+        minute=0, 
+        kwargs={
+            'bot': bot,
+            'shop_list': shops_list
+            } 
+    )
+    
+    scheduler.start()  
     
     dp.include_router(router)
     await dp.start_polling(bot)
