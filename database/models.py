@@ -16,33 +16,6 @@ from enum import (
 
 
 # *** All tables
-
-
-class ShopType(Enum):
-    foxtrot = {
-            'price': 'product-box__main_price',
-            'name': 'page__title'
-    }
-    allo = {
-            'price': 'a-product-price__current',
-            'name': 'p-view__header-title'
-    }
-    comfy = {
-            'price': 'price__current',
-            'name': 'product-title'
-    },
-    cytrus = {
-            'price': 'price',
-            'name': 'DescriptionTitle_title__PxMkv'
-    }
-    moyo = {
-            'price': 'product_price_current',
-            'name': 'product_name'
-    }
-    stylus = {
-            'price': 'sc-7d638165-4',
-            'name': 'sc-4bec5e00-0'
-    }
     
 
 class Users(Base):
@@ -69,21 +42,16 @@ class Products(Base):
     )
     link: Mapped[str] = mapped_column(primary_key=True)
     name: Mapped[str]
-    shop: Mapped[ShopType]
     user: Mapped['Users'] = relationship(
         back_populates='tracked_products'
     )
     price_0: Mapped[int]
-    price_1: Mapped[int]
-    price_2: Mapped[int]
-    price_3: Mapped[int]
-    price_4: Mapped[int]
-    price_5: Mapped[int]
-    price_6: Mapped[int]
-    
-    __table_args__ = (
-        Index('shop', 'shop'),
-    )
+    price_1: Mapped[int | None]
+    price_2: Mapped[int | None]
+    price_3: Mapped[int | None]
+    price_4: Mapped[int | None]
+    price_5: Mapped[int | None]
+    price_6: Mapped[int | None]
     
     def __repr__(self):
         return f'<Product, user_id={self.user_id}, name={self.name}, shop={self.shop}, last_price={self.price_0}>'
